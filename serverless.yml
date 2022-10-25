@@ -1,0 +1,34 @@
+service: serverless-eventbridge-demo
+
+plugins:
+  - serverless-better-credentials
+  - serverless-ruby-layer
+  - serverless-esbuild
+
+provider:
+  name: aws
+  stage: dev
+  region: us-west-2
+  memorySize: 128
+  runtime: ruby2.7
+  # iamRoleStatements:
+  #   - Effect: Allow
+  #     Action:
+  #       - s3:*
+  #     Resource: "*"
+
+	
+functions:
+  producer:
+    handler: producer/index.handler
+    runtime: ruby2.7
+  consumer:
+    handler: consumer/index.handler
+    runtime: nodejs16.x
+    events:
+      # Re-use an existing event bus
+      - eventBridge:
+          eventBus: arn:aws:events:us-west-2:320307122038:event-bus/xiaolong-test
+          pattern:
+            source:
+              - custom.private
